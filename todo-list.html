@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .todo-item { display: flex; justify-content: space-between; margin: 5px 0; }
+        .todo-item input[type="text"] { flex: 1; }
+        .todo-item button { margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <input type="text" id="new-task" placeholder="Add a new task...">
+    <select id="priority-level">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+    </select>
+    <button id="add-task">Add Task</button>
+    <div id="filters">
+        <button id="show-all">Show All</button>
+        <button id="filter-high">Show High Priority</button>
+        <button id="filter-medium">Show Medium Priority</button>
+        <button id="filter-low">Show Low Priority</button>
+    </div>
+    <div id="todo-list"></div>
+
+    <script>
+        const todoListElement = document.getElementById('todo-list');
+        const newTaskInput = document.getElementById('new-task');
+        const prioritySelect = document.getElementById('priority-level');
+        const addTaskButton = document.getElementById('add-task');
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        const renderTodos = (filter = null) => {
+            todoListElement.innerHTML = '';
+            const filteredTodos = filter ? todos.filter(todo => todo.priority === filter) : todos;
+            filteredTodos.forEach((todo, index) => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                todoItem.innerHTML = `<input type='text' value='${todo.text}' readonly /> <button onclick='deleteTask(${index})'>Delete</button>`;
+                todoListElement.appendChild(todoItem);
+            });
+        };
+
+        const addTask = () => {
+            const taskText = newTaskInput.value;
+            const priority = prioritySelect.value;
+            if (taskText) {
+                todos.push({ text: taskText, priority: priority });
+                localStorage.setItem('todos', JSON.stringify(todos));
+                newTaskInput.value = '';
+                renderTodos();
+            }
+        };
+
+        const deleteTask = (index) => {
+            todos.splice(index, 1);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            renderTodos();
+        };
+
+        addTaskButton.addEventListener('click', addTask);
+        document.getElementById('show-all').addEventListener('click', () => renderTodos());
+        document.getElementById('filter-high').addEventListener('click', () => renderTodos('high'));
+        document.getElementById('filter-medium').addEventListener('click', () => renderTodos('medium'));
+        document.getElementById('filter-low').addEventListener('click', () => renderTodos('low'));
+
+        renderTodos();
+    </script>
+</body>
+</html>
