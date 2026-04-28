@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .clock { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Interactive Digital Clock</h1>
+    <div class="clock" id="clocks"></div>
+    <input type="text" id="timezoneInput" placeholder="Enter custom time zone (e.g., GMT+3)">
+    <button id="addTimezone">Add Time Zone</button>
+    <script>
+        const timeZones = [
+            { name: 'New York', offset: -4 },  // EDT
+            { name: 'London', offset: 1 },    // BST
+            { name: 'Tokyo', offset: 9 },     // JST
+            { name: 'Sydney', offset: 10 },    // AEDT
+            { name: 'Dubai', offset: 4 },     // GST
+            { name: 'Singapore', offset: 8 }   // SGT
+        ];
+
+        function updateClocks() {
+            const clocksDiv = document.getElementById('clocks');
+            clocksDiv.innerHTML = '';
+            const utcDate = new Date();
+
+            timeZones.forEach(zone => {
+                const localTime = new Date(utcDate.getTime() + zone.offset * 3600 * 1000);
+                clocksDiv.innerHTML += `<div>${zone.name}: ${localTime.toLocaleTimeString()}</div>`;
+            });
+        }
+
+        document.getElementById('addTimezone').addEventListener('click', () => {
+            const timezoneInput = document.getElementById('timezoneInput').value;
+            const match = timezoneInput.match(/GMT([+-]\d+)/);
+            if (match) {
+                const offset = parseInt(match[1], 10);
+                timeZones.push({ name: timezoneInput, offset });
+                document.getElementById('timezoneInput').value = '';
+                updateClocks();
+            } else {
+                alert('Invalid time zone format!');
+            }
+        });
+
+        setInterval(updateClocks, 1000);
+        updateClocks();
+    </script>
+</body>
+</html>
